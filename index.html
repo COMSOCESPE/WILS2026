@@ -68,17 +68,6 @@ header.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:180p
 .star svg{width:20px;height:20px}
 .par{font-size:12px;color:var(--muted);margin-top:4px}
 .live-pill{display:inline-block;background:#e11d48;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:2px}
-.cert{background:linear-gradient(135deg,var(--navy2),#0b1a33);color:#fff;border-radius:16px;padding:16px;margin:18px 0 8px}
-.cert h2{margin:0 0 4px;font-size:17px}
-.cert p{margin:0 0 10px;font-size:13px;opacity:.9}
-.req{display:flex;flex-direction:column;gap:7px}
-.rq{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:10px;padding:8px 10px;font-size:13px;cursor:pointer;border:0;color:#fff;text-align:left;font-family:inherit;width:100%}
-.ck{width:20px;height:20px;border-radius:6px;border:2px solid var(--cyan);flex:none;display:grid;place-items:center}
-.rq.done .ck{background:var(--cyan)}
-.rq.done .ck::after{content:"";width:9px;height:5px;border-left:2px solid var(--navy);border-bottom:2px solid var(--navy);transform:rotate(-45deg) translate(1px,-1px)}
-.progress{height:6px;background:rgba(255,255,255,.15);border-radius:6px;margin-top:10px;overflow:hidden}
-.progress i{display:block;height:100%;background:var(--yellow);width:0;transition:width .3s}
-.note{font-size:11.5px;opacity:.75;margin-top:8px}
 .sect{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
 .info{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:13.5px}
 .info p{margin:0 0 8px}.info p:last-child{margin:0}
@@ -115,7 +104,6 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:24px}
     <div class="meta">
       <span class="chip">26 y 27 de noviembre</span>
       <span class="chip">Coliseo GRAD. Miguel G. Iturralde · ESPE</span>
-      <span class="chip">Ambas jornadas en el coliseo</span>
     </div>
   </div>
 </header>
@@ -132,8 +120,6 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:24px}
   </div>
   <div class="filters" id="filters"></div>
   <div class="list" id="list"></div>
-
-  <section class="cert" id="cert"></section>
 
   <div class="sect">¿Cómo registro mi asistencia?</div>
   <div class="info">
@@ -173,31 +159,28 @@ const TYPES = {
 
 /* Agenda final: Agenda Nueva WILS.xlsx, Hoja1, filas 12–40. d: día; z: zona del coliseo; reg: asistencia; point: hora puntual. */
 const EV = [
-  {"id": "j-reg", "d": 1, "s": "07:00", "e": "08:00", "t": "log", "ti": "Registro y entrega de kits", "par": "Feria: montaje de stands", "z": "Escenario"},
-  {"id": "j-ina", "d": 1, "s": "08:00", "e": "08:30", "t": "log", "ti": "Inauguración", "par": "Feria: stands listos", "z": "Escenario"},
-  {"id": "j-c1", "d": 1, "s": "08:30", "e": "09:15", "t": "charla", "ti": "Presentación y demostración tecnológica: VÖRDOR en acción", "sp": "Salma Villegas", "reg": 1, "z": "Escenario"},
+  {"id": "j-reg", "d": 1, "s": "07:00", "e": "08:00", "t": "log", "ti": "Registro y entrega de kits", "z": "Escenario"},
+  {"id": "j-ina", "d": 1, "s": "08:00", "e": "08:30", "t": "log", "ti": "Inauguración", "z": "Escenario"},
+  {"id": "j-c1", "d": 1, "s": "08:30", "e": "09:15", "t": "charla", "ti": "VÖRDOR: agente inteligente para la automatización de servicios tecnológicos y la atención empresarial mediante inteligencia artificial", "sp": "Salma Villegas", "reg": 1, "z": "Escenario"},
   {"id": "j-c3", "d": 1, "s": "09:15", "e": "10:00", "t": "charla", "ti": "Evolución de las Redes Móviles: Tecnología, Talento e Inversión", "sp": "Javier Cadena", "reg": 1, "z": "Escenario"},
-  {"id": "j-t1", "d": 1, "s": "10:00", "e": "10:45", "t": "taller", "ti": "Lo que la tecnología no hace por nosotros: Soft Skills", "sp": "Ing. Paola Suárez", "reg": 1, "key": 1, "z": "Escenario"},
-  {"id": "j-cof", "d": 1, "s": "10:45", "e": "11:00", "t": "log", "ti": "Coffee break", "z": "Escenario"},
+  {"id": "j-t1", "d": 1, "s": "10:00", "e": "10:45", "t": "taller", "ti": "Lo que la tecnología no hace por nosotros: Soft Skills", "sp": "Ing. Paola Suárez", "reg": 1, "z": "Escenario"},
   {"id": "j-c4", "d": 1, "s": "11:00", "e": "11:30", "t": "empresa", "ti": "Ciberseguridad: Nivel de madurez en seguridad de la información en Ecuador", "sp": "Nicolás Díaz · E-Open Solutions", "reg": 1, "z": "Escenario"},
   {"id": "j-c5", "d": 1, "s": "11:30", "e": "12:00", "t": "empresa", "ti": "3 ms para no quedarse a oscuras", "sp": "Hugo Posso · ELSYSTEC S.A.", "reg": 1, "z": "Escenario"},
   {"id": "j-c6", "d": 1, "s": "12:00", "e": "12:30", "t": "empresa", "ti": "Más allá del GANTT: Scrum aplicado al despliegue real de redes de telecomunicaciones", "sp": "Andrés Omar Merino Aguirre y Patricio Alexander Jaramillo Mina · FIBRAMAX", "reg": 1, "z": "Escenario"},
   {"id": "j-fer", "d": 1, "s": "08:30", "e": "13:00", "t": "feria", "ti": "Feria Tecnológica IEEE TechDefense II", "par": "Feria tecnológica y empresas · Abierta hasta las 13:00", "reg": 1, "feria": 1, "z": "Feria tecnológica y empresas"},
   {"id": "j-rev", "d": 1, "s": "11:30", "e": "12:30", "t": "carros", "ti": "Revisión técnica de carros y pruebas libres", "z": "Pista y boxes"},
-  {"id": "j-alm", "d": 1, "s": "12:30", "e": "14:00", "t": "log", "ti": "Almuerzo", "z": "Escenario"},
   {"id": "j-car", "d": 1, "s": "14:00", "e": "17:30", "t": "carros", "ti": "Competencia Wireless Car: clasificatorias", "reg": 1, "car": 1, "z": "Pista y boxes"},
   {"id": "j-fin", "d": 1, "s": "17:30", "e": "17:30", "t": "log", "ti": "Cierre del día", "point": 1, "z": "Escenario"},
-  {"id": "v-reg", "d": 2, "s": "07:30", "e": "08:00", "t": "log", "ti": "Registro y entrada de asistentes", "par": "Feria: montaje de stands", "z": "Escenario"},
-  {"id": "v-bie", "d": 2, "s": "08:00", "e": "08:05", "t": "log", "ti": "Bienvenida", "par": "Feria: stands listos", "z": "Escenario"},
+  {"id": "v-reg", "d": 2, "s": "07:30", "e": "08:00", "t": "log", "ti": "Registro y entrada de asistentes", "z": "Escenario"},
+  {"id": "v-bie", "d": 2, "s": "08:00", "e": "08:05", "t": "log", "ti": "Bienvenida", "z": "Escenario"},
   {"id": "v-c1", "d": 2, "s": "08:05", "e": "08:35", "t": "charla", "ti": "Tecnología que salva vidas: Inteligencia artificial, conectividad y automatización: el futuro de la seguridad vial", "sp": "Mgs. Jorge Vinicio Maldonado Pazmiño", "reg": 1, "z": "Escenario"},
   {"id": "v-c2", "d": 2, "s": "08:35", "e": "09:00", "t": "charla", "ti": "Radar: aplicación de tecnología para la Defensa Nacional", "sp": "Coronel Rommel Torres", "reg": 1, "z": "Escenario"},
   {"id": "v-c3", "d": 2, "s": "09:00", "e": "09:45", "t": "empresa", "ti": "Lo que veo cuando contrato (y lo que nadie te dice)", "sp": "Diego Loor · CIEMTELCOM", "reg": 1, "z": "Escenario"},
   {"id": "v-c4", "d": 2, "s": "09:45", "e": "10:45", "t": "empresa", "ti": "Equipos de prueba y medición para aplicaciones en redes 5G", "sp": "Marcelo Cárdenas · Complementos Electrónicos", "reg": 1, "z": "Escenario"},
   {"id": "v-fer", "d": 2, "s": "08:05", "e": "13:00", "t": "feria", "ti": "Feria Tecnológica IEEE TechDefense II", "par": "Feria tecnológica y empresas · Abierta hasta las 13:00", "reg": 1, "feria": 1, "z": "Feria tecnológica y empresas"},
-  {"id": "v-pit", "d": 2, "s": "10:45", "e": "11:30", "t": "feria", "ti": "Pitch de la feria + coffee break", "par": "9 proyectos · 5 minutos cada uno", "z": "Escenario"},
+  {"id": "v-pit", "d": 2, "s": "10:45", "e": "11:30", "t": "feria", "ti": "Pitch de los proyectos de la feria", "par": "9 proyectos · 5 minutos cada uno", "z": "Escenario"},
   {"id": "v-c5", "d": 2, "s": "11:30", "e": "12:00", "t": "empresa", "ti": "Cuando cada milisegundo cuenta: El futuro de las redes inteligentes y la conectividad de baja latencia", "sp": "Sebastián Santín · ZTE", "reg": 1, "z": "Escenario"},
-  {"id": "v-for", "d": 2, "s": "12:00", "e": "13:00", "t": "foro", "ti": "Leadership Forum: Connect, Inspire, Lead: Building the Next Generation of ComSoc Leaders", "sp": "Panel de líderes IEEE y de la industria", "reg": 1, "key": 1, "panel": ["Román Lara-Cueva · Líder profesional de capítulo | Chair, IEEE ComSoc Ecuador", "Daniela Egas · Líder estudiantil de capítulo | Presidenta, IEEE ComSoc ESPE", "Lady Pasquel · Líder WICE | Women in Communications Engineering, IEEE ComSoc", "Steven Vinueza · Líder profesional de capítulo estudiantil", "Celeste Santander · Líder YP | Young Professionals", "Jefferson Loor · Líder empresarial | Representante de la industria", "Gisel Custodio · Moderadora | Community Manager IEEE ComSoc Ecuador"], "z": "Escenario"},
-  {"id": "v-alm", "d": 2, "s": "13:00", "e": "14:30", "t": "log", "ti": "Almuerzo", "z": "Escenario"},
+  {"id": "v-for", "d": 2, "s": "12:00", "e": "13:00", "t": "foro", "ti": "Leadership Forum: Connect, Inspire, Lead: Building the Next Generation of ComSoc Leaders", "sp": "Panel de líderes IEEE y de la industria", "reg": 1, "panel": ["Román Lara-Cueva · Líder profesional de capítulo | Chair, IEEE ComSoc Ecuador", "Daniela Egas · Líder estudiantil de capítulo | Presidenta, IEEE ComSoc ESPE", "Lady Pasquel · Líder WICE | Women in Communications Engineering, IEEE ComSoc", "Steven Vinueza · Líder profesional de capítulo estudiantil", "Celeste Santander · Líder YP | Young Professionals", "Jefferson Loor · Líder empresarial | Representante de la industria", "Gisel Custodio · Moderadora | Community Manager IEEE ComSoc Ecuador"], "z": "Escenario"},
   {"id": "v-car", "d": 2, "s": "14:30", "e": "17:00", "t": "carros", "ti": "Competencia Wireless Car: repechaje y gran final", "reg": 1, "car": 1, "z": "Pista y boxes"},
   {"id": "v-pre", "d": 2, "s": "17:00", "e": "17:30", "t": "log", "ti": "Premiación y clausura", "par": "Wireless Car, feria, reconocimientos a ponentes y sponsors", "z": "Escenario"}
 ];
@@ -211,7 +194,6 @@ const store = {
   set(k,v){try{localStorage.setItem("wils26-"+k,JSON.stringify(v))}catch(e){}}
 };
 let favs = new Set(store.get("favs",[]).filter(id=>EV.some(e=>e.id===id)));
-let done = store.get("done",{});
 let day = store.get("day",null);
 let filter = "todo";
 
@@ -357,7 +339,6 @@ function openSheet(id){
   }
   if(e.panel) h += `<div class="desc"><b>Panelistas</b></div><ol class="pan">${e.panel.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>`;
   h += `<div class="desc">${b.resumen?esc(b.resumen):(e.tbc?"Muy pronto anunciaremos esta actividad.":e.feria?"Recorre los stands, conoce los proyectos y conversa con sus equipos. Cada stand tiene un código único: pídelo al terminar tu visita para registrar tu asistencia.":e.car?"Equipos de universidades de todo el país compiten con vehículos a escala controlados de forma inalámbrica, sin línea de vista. El código de asistencia se anuncia por micrófono.":e.par?esc(e.par):e.t==="log"||e.t==="carros"?"":"Consulta el tema y el horario de esta intervención en la agenda.")}</div>`;
-  if(e.key) h += `<div class="hint" style="text-align:left">★ Actividad clave para el certificado.</div>`;
   if(e.reg){
     const st = regState(e), url = asistURL(e);
     if(st.ok && url) h += `<a class="btn pri" href="${url}" target="_blank" rel="noopener">Registrar mi asistencia</a><div class="hint">Ten a mano tu cédula y el código ${e.feria?"del stand":e.car?"anunciado por micrófono":"que aparece en la pantalla"}.</div>`;
@@ -373,23 +354,6 @@ function closeSheet(){ $("#sheet").classList.remove("on"); $("#bg").classList.re
 $("#bg").onclick = closeSheet;
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeSheet(); });
 
-/* ===== Certificado ===== */
-const REQ = [
-  {k:"c1",n:"Charla, taller o foro #1"},{k:"c2",n:"Charla, taller o foro #2"},{k:"c3",n:"Charla, taller o foro #3"},
-  {k:"key",n:"Una de ellas: Soft Skills (Paola Suárez) o Leadership Forum"},
-  {k:"feria",n:"Visita a la feria tecnológica (código de un stand)"},
-  {k:"car",n:"Competencia Wireless Car (código por micrófono)"}
-];
-function renderCert(){
-  const c = REQ.filter(r=>done[r.k]).length;
-  $("#cert").innerHTML = `<h2>Tu certificado de participación</h2>
-    <p>Para recibirlo, registra tu asistencia en:</p>
-    <div class="req">${REQ.map(r=>`<button class="rq${done[r.k]?" done":""}" data-k="${r.k}"><span class="ck"></span>${r.n}</button>`).join("")}</div>
-    <div class="progress"><i style="width:${Math.round(c/REQ.length*100)}%"></i></div>
-    <div class="note">Marca lo que ya registraste para llevar tu control. El conteo oficial lo hace la organización con tus registros.</div>`;
-  $("#cert").querySelectorAll(".rq").forEach(b=>b.onclick=()=>{done[b.dataset.k]=!done[b.dataset.k];store.set("done",done);renderCert();});
-}
-
 /* ===== Utilidades ===== */
 let tt; function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2200);}
 
@@ -401,7 +365,7 @@ function pickDay(){
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{day=t.dataset.day;store.set("day",day);renderList();});
 window.addEventListener("hashchange",()=>{renderNow();renderList();});
 
-pickDay(); renderNow(); renderQuick(); renderFilters(); renderList(); renderCert();
+pickDay(); renderNow(); renderQuick(); renderFilters(); renderList();
 setInterval(()=>{renderNow();renderList();},30000);
 </script>
 </body>
