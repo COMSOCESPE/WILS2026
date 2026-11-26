@@ -93,6 +93,21 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:24px}
 .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:6px}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120px);background:var(--navy2);color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;transition:transform .25s;z-index:30;max-width:90%}
 .toast.on{transform:translateX(-50%)}
+/* Control personal del certificado */
+.cert-progress{height:9px;background:var(--line);border-radius:999px;overflow:hidden;margin:10px 0}
+.cert-progress span{display:block;height:100%;background:var(--blue);transition:width .2s}
+.cert-status{font-weight:600;margin-bottom:8px}
+.cert-req{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)}
+.cert-req:last-child{border-bottom:0}
+.cert-check{font-weight:700;color:var(--blue);min-width:18px;text-align:center}
+.cert-detail{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.cert-detail summary{cursor:pointer;font-weight:600}
+.cert-option{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.cert-option input{accent-color:var(--blue);width:18px;height:18px;flex:none;margin:3px 0 0}
+.cert-option small{display:block;color:var(--muted);font-size:11.5px}
+.cert-note{color:var(--muted);font-size:12px;margin-top:10px!important}
+.cert-inline{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:12px;display:flex;gap:8px;align-items:flex-start;font-size:13px;cursor:pointer}
+.cert-inline input{accent-color:var(--blue);width:18px;height:18px;flex:none;margin:2px 0 0}
 </style>
 </head>
 <body>
@@ -121,11 +136,20 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:24px}
   <div class="filters" id="filters"></div>
   <div class="list" id="list"></div>
 
+  <div class="sect">Tu certificado de participación</div>
+  <section class="info" id="cert">
+    <p><b>Completa 3 charlas, talleres o foros diferentes</b> (al menos uno debe ser Soft Skills o Leadership Forum), visita la feria tecnológica y asiste a Wireless Car.</p>
+    <div id="cert-summary" aria-live="polite"></div>
+    <details class="cert-detail"><summary>Marcar las actividades que ya registré</summary><div id="cert-options"></div></details>
+    <p class="cert-note">Este control es personal y se guarda solo en este navegador. Marca una actividad después de enviar el formulario. No sustituye el registro oficial ni garantiza el certificado.</p>
+  </section>
   <div class="sect">¿Cómo registro mi asistencia?</div>
   <div class="info">
-    <p><b>Charlas, talleres y foro:</b> al terminar cada actividad se muestra un código en la pantalla del escenario. Abre la actividad en esta agenda, toca <b>Registrar mi asistencia</b> e ingresa tu cédula y el código.</p>
-    <p><b>Feria tecnológica:</b> cada stand tiene su propio código. Pídelo al equipo que te atendió y regístralo en la actividad “Feria tecnológica”.</p>
-    <p><b>Competencia Wireless Car:</b> el código se anuncia por micrófono durante la competencia, el jueves y el viernes.</p>
+    <p><b>1. Accede a la agenda:</b> escanea el QR de tu gafete, abre el Linktree de IEEE ComSoc ESPE y selecciona la agenda WILS 2026.</p>
+    <p><b>2. Selecciona la actividad:</b> abre la actividad a la que asististe y pulsa <b>Registrar mi asistencia</b>.</p>
+    <p><b>3. Completa el formulario:</b> ingresa tu número de cédula, selecciona la actividad correspondiente y envía tu respuesta.</p>
+    <p><b>Horarios de registro:</b> para charlas, talleres y foro, el botón se habilita 5 minutos antes de finalizar y hasta una hora después. Para la feria tecnológica y Wireless Car, el registro está disponible únicamente durante la actividad.</p>
+    <p><b>Importante:</b> todas las actividades utilizan un único formulario de Google. Solo las respuestas enviadas y validadas por la organización cuentan para el certificado.</p>
   </div>
 
   <div class="sect">Comparte el evento</div>
@@ -144,12 +168,12 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:24px}
 /* ===== Configuración: enlaces que se completan cuando estén listos ===== */
 const LINKS = {
   registro: "",      // Formulario de registro en el evento (Google Forms)
-  asistencia: "",    // Formulario de asistencia por actividad (Google Forms)
+  asistencia: "https://docs.google.com/forms/d/e/1FAIpQLSfvREQUBpVylpjRWWq6-IB6qzB0I7Athk2wPp8ZKbn4Of50iA/viewform?usp=pp_url",    // Formulario de asistencia por actividad (Google Forms)
   whatsapp: "",      // Comunidad de WhatsApp de asistentes
   instagram: "https://www.instagram.com/ieee.espe.comsoc",
   linktree: "https://linktr.ee/ieee.espe.comsoc"
 };
-/* Para precargar la actividad en el formulario de asistencia: id del campo "Actividad" (entry.XXXX) */
+/* OPCIONAL: para precargar la actividad en Google Forms, usar la URL completa viewform en LINKS.asistencia y el id del campo Actividad (entry.XXXX) aquí. Las opciones del formulario deben coincidir con los textos de opciones_actividades.txt. Sin id, el asistente selecciona manualmente. */
 const ASIST_ENTRY = "";
 
 const TYPES = {
@@ -184,8 +208,16 @@ const EV = [
   {"id": "v-car", "d": 2, "s": "14:30", "e": "17:00", "t": "carros", "ti": "Competencia Wireless Car: repechaje y gran final", "reg": 1, "car": 1, "z": "Pista y boxes"},
   {"id": "v-pre", "d": 2, "s": "17:00", "e": "17:30", "t": "log", "ti": "Premiación y clausura", "par": "Wireless Car, feria, reconocimientos a ponentes y sponsors", "z": "Escenario"}
 ];
-/* Biografías y fotos de ponentes: se completan aquí cuando lleguen (foto como data URI) */
-const BIO = {};
+/* Perfiles disponibles en PONENTES WILS.xlsx. No se incorporan biografías sin datos confirmados. */
+const BIO = {
+  "j-c3": {cargo:"Consultor en estrategia y transformación tecnológica",resumen:"Ingeniero en Electrónica y Telecomunicaciones, con MBA y más de 23 años de experiencia en la industria. Ha desempeñado posiciones de liderazgo en estrategia tecnológica, planificación de inversiones y transformación de redes."},
+  "j-c4": {cargo:"E-Open Solutions"},
+  "j-c5": {cargo:"ELSYSTEC S.A."},
+  "j-c6": {cargo:"FIBRAMAX"},
+  "v-c3": {cargo:"Fundador, CEO y director comercial regional de CIEMTELCOM",resumen:"Ingeniero en telecomunicaciones por la EPN. Fundó CIEMTELCOM hace más de 20 años; la empresa de telecomunicaciones y tecnología opera en Ecuador, Perú y Colombia."},
+  "v-c4": {cargo:"Gerente de Ventas de Instrumentación para Electrónica y Telecomunicaciones",resumen:"Marcelo Cárdenas Álvarez se desempeña desde 1999 como gerente de ventas de instrumentación en Complementos Electrónicos S.A. Cuenta con formación en ingeniería electrónica y telecomunicaciones e ingeniería comercial."},
+  "v-c5": {cargo:"ZTE"}
+};
 
 const DATES = {1:"2026-11-26",2:"2026-11-27"};
 const $ = s => document.querySelector(s);
@@ -196,6 +228,34 @@ const store = {
 let favs = new Set(store.get("favs",[]).filter(id=>EV.some(e=>e.id===id)));
 let day = store.get("day",null);
 let filter = "todo";
+let sheetId = null;
+const eligible = EV.filter(e=>e.reg);
+const talks = eligible.filter(e=>!e.feria && !e.car);
+const mandatoryIds = ["j-t1","v-for"];
+const checked = new Set(store.get("cert-checked",[]).filter(id=>eligible.some(e=>e.id===id)));
+function certState(ids=checked){
+  const count = talks.filter(e=>ids.has(e.id)).length;
+  const mandatory = mandatoryIds.some(id=>ids.has(id));
+  const feria = eligible.some(e=>e.feria && ids.has(e.id));
+  const car = eligible.some(e=>e.car && ids.has(e.id));
+  return {count,mandatory,feria,car,done:count>=3 && mandatory && feria && car};
+}
+function renderCertSummary(){
+  const c=certState(), progress=Math.min(c.count,3)+Number(c.mandatory)+Number(c.feria)+Number(c.car);
+  const rows=[[c.count>=3,`Charlas, talleres o foros: ${Math.min(c.count,3)} de 3`],[c.mandatory,"Soft Skills o Leadership Forum (cuenta dentro de las 3)"],[c.feria,"Visita a la feria tecnológica"],[c.car,"Asistencia a Wireless Car"]];
+  $("#cert-summary").innerHTML=`<div class="cert-progress" role="progressbar" aria-label="Progreso personal" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="6"><span style="width:${progress/6*100}%"></span></div><div class="cert-status">${c.done?"Requisitos marcados en tu control personal":"Tu progreso personal"}</div>`+rows.map(([ok,label])=>`<div class="cert-req"><span class="cert-check" aria-hidden="true">${ok?"✓":"○"}</span><span>${esc(label)}</span></div>`).join("");
+}
+function renderCert(){
+  renderCertSummary();
+  $("#cert-options").innerHTML=sorted(eligible).map(e=>`<label class="cert-option"><input type="checkbox" data-cert="${e.id}" ${checked.has(e.id)?"checked":""}><span>${esc(e.ti)}<small>${dayLabel(e)} · ${timeLabel(e)}${mandatoryIds.includes(e.id)?" · Opción obligatoria":""}</small></span></label>`).join("");
+  $("#cert-options").querySelectorAll("[data-cert]").forEach(el=>el.onchange=()=>setChecked(el.dataset.cert,el.checked));
+}
+function setChecked(id,value){
+  if(!eligible.some(e=>e.id===id))return;
+  value?checked.add(id):checked.delete(id);
+  store.set("cert-checked",[...checked]); renderCertSummary();
+  document.querySelectorAll("[data-cert]").forEach(el=>{if(el.dataset.cert===id)el.checked=value;});
+}
 
 /* Hora de Ecuador (UTC-5). #demo1 / #demo2 simulan el jueves o viernes a las 10:20 */
 function nowEC(){
@@ -220,11 +280,11 @@ function renderNow(){
   const first = at(1,"07:00"), last = at(2,"17:30");
   if(n < first){
     const days = Math.ceil((first - n)/86400000);
-    el.innerHTML = `<div class="lab">Cuenta regresiva</div><div class="row"><div><div class="t">${days<=1?"¡Mañana empieza el WILS 2026!":"Faltan "+days+" días para el WILS 2026"}</div><div class="s">Jueves 26 de noviembre · Registro desde las 07:00</div></div></div>`;
+    el.innerHTML = `<div class="lab">Cuenta regresiva</div><div class="row"><div><div class="t">${days<=1?(n>=at(1,"00:00")?"¡Hoy empieza el WILS 2026!":"¡Mañana empieza el WILS 2026!"):"Faltan "+days+" días para el WILS 2026"}</div><div class="s">Jueves 26 de noviembre · Registro desde las 07:00</div></div></div>`;
     return;
   }
   if(n >= last){
-    el.innerHTML = `<div class="lab">WILS 2026</div><div class="row"><div><div class="t">¡Gracias por ser parte del WILS 2026!</div><div class="s">Los certificados se enviarán a tu correo.</div></div></div>`;
+    el.innerHTML = `<div class="lab">WILS 2026</div><div class="row"><div><div class="t">¡Gracias por ser parte del WILS 2026!</div><div class="s">La organización verificará las asistencias para la entrega de certificados.</div></div></div>`;
     return;
   }
   const live = sorted(main).filter(e=>startOf(e)<=n && n<endOf(e));
@@ -240,7 +300,7 @@ function renderNow(){
     h += `<div class="next">A continuación${mins<=60?" (en "+mins+" min)":""}: <b>${esc(nxt.ti)}</b> · ${dayLabel(nxt)} · ${nxt.s}</div>`;
   }
   if(fav && fav!==nxt){ h += `<div class="next">★ Tu próxima actividad marcada: <b>${esc(fav.ti)}</b> · ${dayLabel(fav)} · ${fav.s}</div>`; }
-  if(feriaOpen) h += `<div class="next">La feria tecnológica está abierta hasta las 13:00. ¡No olvides pedir el código de un stand!</div>`;
+  if(feriaOpen) h += `<div class="next">La feria tecnológica está abierta hasta las 13:00.</div>`;
   el.innerHTML = h;
 }
 
@@ -314,23 +374,41 @@ function regState(e){
   const n = nowEC();
   if(e.feria || e.car){
     if(n < startOf(e)) return {ok:false,msg:`Se habilita cuando empiece (${e.s})`};
-    if(n > new Date(endOf(e).getTime()+90*60000)) return {ok:false,msg:"El registro de esta actividad ya cerró"};
+    if(n >= endOf(e)) return {ok:false,msg:"El registro de esta actividad ya cerró"};
     return {ok:true};
   }
   const open = new Date(endOf(e).getTime()-5*60000), close = new Date(endOf(e).getTime()+60*60000);
-  if(n < open) return {ok:false,msg:`Se habilita al terminar la actividad (${e.e})`};
+  if(n < open) return {ok:false,msg:`Se habilita a las ${new Date(open.getTime()-5*3600000).toISOString().slice(11,16)} (5 min antes de terminar)`};
   if(n > close) return {ok:false,msg:"El registro de esta actividad ya cerró"};
   return {ok:true};
 }
+function activityLabel(e){return (e.d===1?"Jueves":"Viernes")+" "+e.s+" · "+e.ti;}
+function demoMode(){return ["#demo1","#demo2"].includes(location.hash);}
 function asistURL(e){
   if(!LINKS.asistencia) return "";
   if(!ASIST_ENTRY) return LINKS.asistencia;
-  const label = (e.d===1?"Jueves":"Viernes")+" "+e.s+" · "+e.ti;
-  const sep = LINKS.asistencia.includes("?")?"&":"?";
-  return LINKS.asistencia+sep+"usp=pp_url&"+ASIST_ENTRY+"="+encodeURIComponent(label);
+  const u=new URL(LINKS.asistencia);
+  u.searchParams.set("usp","pp_url"); u.searchParams.set(ASIST_ENTRY,activityLabel(e));
+  return u.href;
+}
+function attendanceMarkup(e){
+  const st=regState(e), url=asistURL(e);
+  if(!st.ok) return `<button class="btn dis" disabled>Registrar mi asistencia</button><div class="hint">${esc(st.msg)}</div>`;
+  if(demoMode())return `<button class="btn dis" disabled>Registrar mi asistencia (demo)</button><div class="hint">Simulación: no envía registros reales.</div>`;
+  if(!url)return `<button class="btn dis" disabled>Registrar mi asistencia</button><div class="hint">El enlace del formulario aún no está configurado.</div>`;
+  return `<a class="btn pri" id="asist-link" href="${esc(url)}" target="_blank" rel="noopener">Registrar mi asistencia</a><div class="hint">Ingresa tu número de cédula y envía el formulario.${!ASIST_ENTRY?" Selecciona en el formulario: <b>"+esc(activityLabel(e))+"</b>.":""}</div>`;
+}
+function refreshAttendance(){
+  const e=EV.find(x=>x.id===sheetId), slot=$("#attendance-slot");
+  if(!e || !e.reg || !slot)return;
+  const markup=attendanceMarkup(e);
+  if(slot.dataset.markup===markup)return;
+  slot.dataset.markup=markup;slot.innerHTML=markup;
+  const a=$("#asist-link");if(a)a.onclick=ev=>{if(!regState(e).ok || demoMode()){ev.preventDefault();refreshAttendance();}};
 }
 function openSheet(id){
-  const e = EV.find(x=>x.id===id), ty = TYPES[e.t], b = BIO[id]||{};
+  const e = EV.find(x=>x.id===id);if(!e)return;sheetId=id;
+  const ty = TYPES[e.t], b = BIO[id]||{};
   let h = `<div class="grab"></div><span class="tag" style="background:${ty.c}">${ty.n}</span>
     <h3>${esc(e.ti)}</h3><div class="when">${e.d===1?"Jueves 26":"Viernes 27"} de noviembre · ${timeLabel(e)}</div><div class="when">Coliseo GRAD. Miguel G. Iturralde · ${esc(e.z)}</div>`;
   if(e.sp && !e.panel){
@@ -338,19 +416,18 @@ function openSheet(id){
       <div><b>${esc(e.sp)}</b><span>${esc(b.cargo||"Ponente")}</span></div></div>`;
   }
   if(e.panel) h += `<div class="desc"><b>Panelistas</b></div><ol class="pan">${e.panel.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>`;
-  h += `<div class="desc">${b.resumen?esc(b.resumen):(e.tbc?"Muy pronto anunciaremos esta actividad.":e.feria?"Recorre los stands, conoce los proyectos y conversa con sus equipos. Cada stand tiene un código único: pídelo al terminar tu visita para registrar tu asistencia.":e.car?"Equipos de universidades de todo el país compiten con vehículos a escala controlados de forma inalámbrica, sin línea de vista. El código de asistencia se anuncia por micrófono.":e.par?esc(e.par):e.t==="log"||e.t==="carros"?"":"Consulta el tema y el horario de esta intervención en la agenda.")}</div>`;
+  h += `<div class="desc">${b.resumen?esc(b.resumen):(e.tbc?"Muy pronto anunciaremos esta actividad.":e.feria?"Recorre los stands, conoce los proyectos y conversa con sus equipos. Registra tu asistencia desde esta actividad mientras la feria esté abierta.":e.car?"Equipos de universidades de todo el país compiten con vehículos a escala controlados de forma inalámbrica, sin línea de vista. Registra tu asistencia desde esta actividad mientras la competencia esté en curso.":e.par?esc(e.par):e.t==="log"||e.t==="carros"?"":"Consulta el tema y el horario de esta intervención en la agenda.")}</div>`;
   if(e.reg){
-    const st = regState(e), url = asistURL(e);
-    if(st.ok && url) h += `<a class="btn pri" href="${url}" target="_blank" rel="noopener">Registrar mi asistencia</a><div class="hint">Ten a mano tu cédula y el código ${e.feria?"del stand":e.car?"anunciado por micrófono":"que aparece en la pantalla"}.</div>`;
-    else if(st.ok) h += `<button class="btn dis" disabled>Registrar mi asistencia</button><div class="hint">El formulario de asistencia estará disponible el día del evento.</div>`;
-    else h += `<button class="btn dis" disabled>Registrar mi asistencia</button><div class="hint">${st.msg}</div>`;
+    h += `<div id="attendance-slot"></div><label class="cert-inline"><input type="checkbox" data-cert="${e.id}" ${checked.has(e.id)?"checked":""}><span>Ya envié mi registro de asistencia (control personal)</span></label>`;
   }
   if(e.t!=="log") h += `<button class="btn sec" id="favBtn">${favs.has(id)?"Quitar de Mi agenda":"☆ Agregar a Mi agenda"}</button>`;
   $("#sheet").innerHTML = h;
+  refreshAttendance();
+  const cc=$("#sheet [data-cert]");if(cc)cc.onchange=()=>setChecked(id,cc.checked);
   const fb = $("#favBtn"); if(fb) fb.onclick=()=>{favs.has(id)?favs.delete(id):favs.add(id);store.set("favs",[...favs]);openSheet(id);renderList();renderNow();};
   $("#sheet").classList.add("on"); $("#bg").classList.add("on");
 }
-function closeSheet(){ $("#sheet").classList.remove("on"); $("#bg").classList.remove("on"); }
+function closeSheet(){ sheetId=null; $("#sheet").classList.remove("on"); $("#bg").classList.remove("on"); }
 $("#bg").onclick = closeSheet;
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeSheet(); });
 
@@ -363,10 +440,11 @@ function pickDay(){
   day = (n >= at(2,"00:00")) ? "2" : "1";
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{day=t.dataset.day;store.set("day",day);renderList();});
-window.addEventListener("hashchange",()=>{renderNow();renderList();});
+window.addEventListener("hashchange",()=>{renderNow();renderList();refreshAttendance();});
 
-pickDay(); renderNow(); renderQuick(); renderFilters(); renderList();
-setInterval(()=>{renderNow();renderList();},30000);
+pickDay(); renderNow(); renderQuick(); renderFilters(); renderList(); renderCert();
+setInterval(()=>{renderNow();renderList();refreshAttendance();},15000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){renderNow();renderList();refreshAttendance();}});
 </script>
 </body>
 </html>
